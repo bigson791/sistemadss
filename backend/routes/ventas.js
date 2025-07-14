@@ -42,4 +42,41 @@ router.get('/ventas-mensuales', async (req, res) => {
   res.json(datos);
 });
 
+// Total de ventas por canal (origen)
+router.get('/origenes', async (req, res) => {
+  try {
+    const resultado = await Venta.aggregate([
+      {
+        $group: {
+          _id: "$origen",
+          total: { $sum: "$total" }
+        }
+      },
+      { $sort: { total: -1 } }
+    ]);
+    res.json(resultado);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Total por tipo de pago
+router.get('/metodos-pago', async (req, res) => {
+  try {
+    const resultado = await Venta.aggregate([
+      {
+        $group: {
+          _id: "$tipoPago",
+          total: { $sum: 1 }
+        }
+      },
+      { $sort: { total: -1 } }
+    ]);
+    res.json(resultado);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 module.exports = router;

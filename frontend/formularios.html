@@ -1,0 +1,203 @@
+<!-- Código HTML actualizado con formularios de ingreso -->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>DSS Ventas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #34495e;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        footer {
+            background-color: #34495e;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #ecf0f1;
+            overflow-y: auto;
+        }
+
+        .formulario {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        .formulario h3 {
+            margin-top: 0;
+        }
+
+        .formulario label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .formulario input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        .formulario button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            margin-right: 10px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .formulario button.cancelar {
+            background-color: #7f8c8d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2>DSS Panel</h2>
+        <a href="#">Dashboard</a>
+        <a href="#formCliente">Clientes</a>
+        <a href="#formProducto">Productos</a>
+        <a href="#formProveedor">Proveedores</a>
+        <a href="#venta">Registro Venta</a>
+        <a href="#compra">Registrar Compra</a>
+        <a href="#pago">Registrar Pago</a>
+    </div>
+    <div class="main">
+        <header>
+            <h1>Sistema de Apoyo a la Toma de Decisiones</h1>
+        </header>
+        <div class="content">
+            <!-- Formularios -->
+            <form id="formCliente" class="formulario">
+                <h3>Agregar Cliente</h3>
+                <label>Nombres</label><input name="nombres" required>
+                <label>Apellidos</label><input name="apellidos" required>
+                <label>Dirección</label><input name="direccion">
+                <label>NIT</label><input name="nit">
+                <label>Correo</label><input name="correo" type="email">
+                <label>Teléfono</label><input name="telefono">
+                <label>Total Pedidos</label><input name="totalPedidos" type="number">
+                <button type="submit">Guardar</button>
+                <button type="button" class="cancelar" onclick="window.scrollTo(0,0)">Cancelar</button>
+            </form>
+
+            <form id="formProducto" class="formulario">
+                <h3>Agregar Producto</h3>
+                <label>Código</label><input name="codigo" required>
+                <label>Nombre del Producto</label><input name="nombre" required>
+                <label>Precio Compra</label><input name="precioCompra" type="number">
+                <label>Precio Venta</label><input name="precioVenta" type="number">
+                <label>Fecha Compra</label><input name="fechaCompra" type="date">
+                <label>Proveedor</label><input name="proveedor">
+                <button type="submit">Guardar</button>
+                <button type="button" class="cancelar" onclick="window.scrollTo(0,0)">Cancelar</button>
+            </form>
+
+            <form id="formProveedor" class="formulario">
+                <h3>Agregar Proveedor</h3>
+                <label>Nombre</label><input name="nombre" required>
+                <label>Teléfono</label><input name="telefono">
+                <label>Correo</label><input name="correo" type="email">
+                <label>Dirección</label><input name="direccion">
+                <label>Persona de Contacto</label><input name="contacto">
+                <button type="submit">Guardar</button>
+                <button type="button" class="cancelar" onclick="window.scrollTo(0,0)">Cancelar</button>
+            </form>
+        </div>
+        <footer>
+            DSS Ventas &copy; 2025
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('formCliente').addEventListener('submit', async e => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            data.fechaIngreso = new Date().toISOString();
+            const res = await fetch('http://localhost:3000/api/clientes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            alert(res.ok ? 'Cliente guardado' : 'Error al guardar cliente');
+        });
+
+        document.getElementById('formProducto').addEventListener('submit', async e => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            data.fechaIngreso = new Date().toISOString();
+            const res = await fetch('http://localhost:3000/api/productos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            alert(res.ok ? 'Producto guardado' : 'Error al guardar producto');
+        });
+
+        document.getElementById('formProveedor').addEventListener('submit', async e => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            data.fechaIngreso = new Date().toISOString();
+            const res = await fetch('http://localhost:3000/api/proveedores', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            alert(res.ok ? 'Proveedor guardado' : 'Error al guardar proveedor');
+        });
+    </script>
+</body>
+
+</html>

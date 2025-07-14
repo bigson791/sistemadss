@@ -5,7 +5,10 @@ const ventaSchema = new mongoose.Schema({
   cliente: String,
   cantidad: Number,
   total: Number,
-  fecha: Date
+  fecha: Date,
+  origen: String,
+  tipoPago: String,
+  cuotas: Number
 });
 
 module.exports = mongoose.model('Venta', ventaSchema);

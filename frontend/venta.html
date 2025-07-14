@@ -1,0 +1,256 @@
+<!-- Código HTML actualizado con pantalla de ventas -->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>DSS Ventas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #34495e;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        footer {
+            background-color: #34495e;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #ecf0f1;
+            overflow-y: auto;
+        }
+
+        .formulario {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        .formulario h3 {
+            margin-top: 0;
+        }
+
+        .formulario label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .formulario input,
+        .formulario select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        .formulario button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            margin-right: 10px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .formulario button.cancelar {
+            background-color: #7f8c8d;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .acciones button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2>DSS Panel</h2>
+        <a href="#">Dashboard</a>
+        <a href="#formCliente">Clientes</a>
+        <a href="#formProducto">Productos</a>
+        <a href="#formProveedor">Proveedores</a>
+        <a href="#venta">Registro Venta</a>
+        <a href="#compra">Registrar Compra</a>
+        <a href="#pago">Registrar Pago</a>
+
+    </div>
+    <div class="main">
+        <header>
+            <h1>Sistema de Apoyo a la Toma de Decisiones</h1>
+        </header>
+        <div class="content">
+            <form id="venta" class="formulario">
+                <h3>Registrar Venta</h3>
+                <label>Correlativo</label><input id="correlativo" required>
+                <label>Cliente</label><input id="cliente" required>
+                <label>Fuente</label>
+                <select id="fuente">
+                    <option>Facebook</option>
+                    <option>Instagram</option>
+                    <option>Web</option>
+                    <option>Whatsapp</option>
+                </select>
+                <label>Tipo de Pago</label>
+                <select id="tipoPago">
+                    <option>Transferencia</option>
+                    <option>Depósito</option>
+                    <option>Tarjeta</option>
+                    <option>Crédito Propio</option>
+                </select>
+
+                <hr>
+                <h4>Agregar Productos</h4>
+                <label>Producto</label><input id="producto">
+                <label>Cantidad</label><input id="cantidad" type="number">
+                <label>Precio</label><input id="precio" type="number">
+                <button type="button" onclick="agregarProducto()">Agregar</button>
+
+                <table id="tablaProductos">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Subtotal</th>
+                            <th>Acción</th>
+
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <h4>Total: Q<span id="totalVenta">0</span></h4>
+                <button type="submit">Guardar Venta</button>
+                <button type="button" class="cancelar" onclick="window.scrollTo(0,0)">Cancelar</button>
+            </form>
+        </div>
+        <footer>
+            DSS Ventas &copy; 2025
+        </footer>
+    </div>
+
+    <script>
+        let productos = [];
+
+        function agregarProducto() {
+            const nombre = document.getElementById('producto').value;
+            const cantidad = parseInt(document.getElementById('cantidad').value);
+            const precio = parseFloat(document.getElementById('precio').value);
+            if (!nombre || isNaN(cantidad) || isNaN(precio)) return alert("Completa todos los campos");
+            productos.push({ nombre, cantidad, precio });
+            actualizarTabla();
+        }
+
+        function eliminarProducto(index) {
+            productos.splice(index, 1);
+            actualizarTabla();
+        }
+
+        function actualizarTabla() {
+            const tbody = document.querySelector('#tablaProductos tbody');
+            tbody.innerHTML = '';
+            let total = 0;
+            productos.forEach((prod, index) => {
+                const subtotal = prod.cantidad * prod.precio;
+                total += subtotal;
+                const row = `
+          <tr>
+            <td>${prod.nombre}</td>
+            <td>${prod.cantidad}</td>
+            <td>${prod.precio.toFixed(2)}</td>
+            <td>${subtotal.toFixed(2)}</td>
+            <td class="acciones"><button onclick="eliminarProducto(${index})">Eliminar</button></td>
+          </tr>`;
+                tbody.innerHTML += row;
+            });
+            document.getElementById('totalVenta').textContent = total.toFixed(2);
+        }
+
+        document.getElementById('venta').addEventListener('submit', async e => {
+            e.preventDefault();
+            const venta = {
+                correlativo: document.getElementById('correlativo').value,
+                cliente: document.getElementById('cliente').value,
+                fuente: document.getElementById('fuente').value,
+                tipoPago: document.getElementById('tipoPago').value,
+                productos,
+                total: parseFloat(document.getElementById('totalVenta').textContent),
+                fecha: new Date().toISOString()
+            };
+            const res = await fetch('http://localhost:3000/api/ventas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(venta)
+            });
+            alert(res.ok ? 'Venta guardada' : 'Error al guardar venta');
+            productos = [];
+            actualizarTabla();
+            e.target.reset();
+        });
+    </script>
+</body>
+
+</html>

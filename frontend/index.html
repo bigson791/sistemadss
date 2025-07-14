@@ -29,7 +29,7 @@
   </script>
 </body>
 </html> -->
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -150,6 +150,205 @@
               title: {
                 display: true,
                 text: 'Resumen de Ventas Mensuales'
+              }
+            }
+          }
+        });
+      });
+  </script>
+</body>
+
+</html> -->
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>DSS Ventas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .main {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: #34495e;
+      color: white;
+      padding: 10px 20px;
+    }
+
+    footer {
+      background-color: #34495e;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .content {
+      flex-grow: 1;
+      padding: 20px;
+      background-color: #ecf0f1;
+      overflow-y: auto;
+    }
+
+    .chart-container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <h2>DSS Panel</h2>
+    <a href="#">Dashboard</a>
+    <a href="#">Clientes</a>
+    <a href="#">Productos</a>
+    <a href="#">Proveedores</a>
+    <a href="#venta">Registro Venta</a>
+    <a href="#compra">Registrar Compra</a>
+    <a href="#pago">Registrar Pago</a>
+  </div>
+
+  <div class="main">
+    <header>
+      <h1>Sistema de Apoyo a la Toma de Decisiones</h1>
+    </header>
+
+    <div class="content">
+      <div class="chart-container">
+        <canvas id="ventasChart" width="400" height="200"></canvas>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="canalChart" width="200" height="200"></canvas>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="metodoPagoChart" width="200" height="200"></canvas>
+      </div>
+    </div>
+
+    <footer>
+      DSS Ventas &copy; 2025
+    </footer>
+  </div>
+
+  <script>
+    fetch('http://localhost:3000/api/ventas/ventas-mensuales')
+      .then(res => res.json())
+      .then(data => {
+        const labels = data.map(d => `Mes ${d._id}`);
+        const valores = data.map(d => d.total);
+        new Chart(document.getElementById("ventasChart"), {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Ventas mensuales',
+              data: valores,
+              backgroundColor: 'rgba(75, 192, 192, 0.6)'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+              },
+              title: {
+                display: true,
+                text: 'Resumen de Ventas Mensuales'
+              }
+            }
+          }
+        });
+      });
+
+    fetch('http://localhost:3000/api/ventas/origenes')
+      .then(res => res.json())
+      .then(data => {
+        const labels = data.map(d => d._id);
+        const valores = data.map(d => d.total);
+        new Chart(document.getElementById("canalChart"), {
+          type: 'pie',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Canales de venta',
+              data: valores,
+              backgroundColor: [
+                '#3498db', '#e74c3c', '#2ecc71', '#9b59b6'
+              ]
+            }]
+          },
+          options: {
+            plugins: {
+              title: {
+                display: true,
+                text: 'Canal con más ventas'
+              }
+            }
+          }
+        });
+      });
+
+    fetch('http://localhost:3000/api/ventas/metodos-pago')
+      .then(res => res.json())
+      .then(data => {
+        const labels = data.map(d => d._id);
+        const valores = data.map(d => d.total);
+        new Chart(document.getElementById("metodoPagoChart"), {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Métodos de Pago',
+              data: valores,
+              backgroundColor: [
+                '#1abc9c', '#f39c12', '#8e44ad', '#c0392b'
+              ]
+            }]
+          },
+          options: {
+            plugins: {
+              title: {
+                display: true,
+                text: 'Método de pago más usado'
               }
             }
           }
