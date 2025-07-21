@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Venta = require('../backend/models/Venta');
+const Usuario = require('../backend/models/Usuario');
 mongoose.connect('mongodb://localhost:27017/dss_ventas');
 //limpiamos la base de datos
 Venta.use
@@ -1218,3 +1219,28 @@ Venta.insertMany(ventas).then(() => {
   console.log('Datos insertados');
   process.exit();
 });
+
+mongoose.connect('mongodb://localhost:27017/dss_ventas')
+  .then(async () => {
+    const existeAdmin = await Usuario.findOne({ nombreUsuario: 'admin' });
+    if (!existeAdmin) {
+      await Usuario.create({
+        nombres: 'Administrador',
+        apellidos: 'Principal',
+        nombreUsuario: 'admin',
+        contrasena: '$us3rDss.-', // En producción deberías hashearla
+        correo: 'admin@dss.com',
+        telefono: '12345678',
+        tipoUsuario: 'admin',
+        fechaCreacion: new Date()
+      });
+      console.log('Usuario admin creado');
+    } else {
+      console.log('Usuario admin ya existe');
+    }
+    process.exit();
+  })
+  .catch(err => {
+    console.error('Error al insertar usuario admin:', err);
+    process.exit(1);
+  });

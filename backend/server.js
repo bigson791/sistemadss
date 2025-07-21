@@ -4,6 +4,7 @@ const ventasRoutes = require('./routes/ventas');
 const clientesRoutes = require('./routes/Clientes');
 const productosRoutes = require('./routes/Productos'); 
 const proveedoresRoutes = require('./routes/Proveedores');
+const usuarios = require('./routes/usuarios');
 const app = express();
 const cors = require('cors');
 require('dotenv').config();
@@ -20,6 +21,7 @@ app.use('/api/ventas', ventasRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/proveedores', proveedoresRoutes);
+app.use('/api/usuarios', usuarios);
 
 app.listen(3000, () => {
   console.log('Servidor DSS en http://localhost:3000');
