@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const proveedorSchema = new mongoose.Schema({
   nombre: String,
+  nit: String,
   telefono: String,
   correo: String,
   direccion: String,
