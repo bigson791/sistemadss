@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Producto = require('../models/Producto');
+const MovimientoInventario  = require('../models/Inventario');
 
 router.get('/', async (req, res) => {
   const productos = await Producto.find();
@@ -8,9 +9,21 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const nuevo = new Producto(req.body);
-  await nuevo.save();
-  res.json({ ok: true });
+  try {
+    const nuevo = new Producto(req.body);
+    const productoGuardado = await nuevo.save();
+    const movimiento = new MovimientoInventario({
+      producto: productoGuardado._id,
+      tipo: 'creacion',
+      cantidad: 0,
+      observacion: 'Producto creado'
+    });
+    await movimiento.save();
+    res.json({ ok: true, id: productoGuardado._id, producto: productoGuardado });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al crear el producto' });
+  }
 });
 
 router.put('/:id', async (req, res) => {
@@ -43,7 +56,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   const productoEliminado = await Producto.findByIdAndDelete(id);
-  if (!productoEliminado) { 
+  if (!productoEliminado) {
     return res.status(404).json({ error: 'Producto no encontrado' });
   }
   res.json({ ok: true });

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Venta = require('../models/Venta');
+const Cliente = require('../models/Cliente');
+const movimientoInventario = require('../models/Inventario');
 
 // Todas las ventas
 router.get('/', async (req, res) => {
@@ -75,6 +77,64 @@ router.get('/metodos-pago', async (req, res) => {
     res.json(resultado);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  try {
+    const venta = await Venta.findById(req.params.id);
+    if (!venta) return res.status(404).json({ error: 'Venta no encontrada' });
+    res.json(venta);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener la venta' });
+  }
+});
+
+// POST: Crear nueva venta
+router.post('/', async (req, res) => {
+  try {
+    const nuevaVenta = new Venta(req.body);
+    ventaRealizada = await nuevaVenta.save();
+    await Cliente.updateOne(
+      { _id: nuevaVenta.clienteid }, // asegúrate que cliente sea un ID
+      { $inc: { totalPedidos: 1 } } // incrementar en 1
+    );
+    ventaRealizada.detalles.forEach(async (element) => {
+      const movimiento = new movimientoInventario({
+        producto: element.idProducto,
+        tipo: 'salida',
+        cantidad: element.cantidad,
+        observacion: 'Venta registrada'
+      });
+      await movimiento.save();
+    })
+    res.status(201).json(nuevaVenta);
+  } catch (error) {
+    res.status(400).json({ error: 'Error al crear venta', detalle: error });
+  }
+});
+
+router.put('/:id', async (req, res) => {
+  try {
+    const ventaActualizada = await Venta.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!ventaActualizada) return res.status(404).json({ error: 'Venta no encontrada' });
+    res.json(ventaActualizada);
+  } catch (error) {
+    res.status(400).json({ error: 'Error al actualizar venta', detalle: error });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const ventaEliminada = await Venta.findByIdAndDelete(req.params.id);
+    if (!ventaEliminada) return res.status(404).json({ error: 'Venta no encontrada' });
+    res.json({ mensaje: 'Venta eliminada correctamente' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar venta' });
   }
 });
 

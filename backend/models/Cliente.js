@@ -9,8 +9,8 @@ const clienteSchema = new mongoose.Schema({
   telefono: String,
   fechaIngreso: { type: Date, default: Date.now },
   fechaActualizacion: Date,
-  estado: String,
-  totalPedidos: Number
+  estado: { type: String, enum: ['activo', 'inactivo'], default: 'activo' },
+  totalPedidos: { type: Number, default: 0 }
 });
 
 module.exports = mongoose.model('Cliente', clienteSchema);
