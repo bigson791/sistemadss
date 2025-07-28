@@ -80,15 +80,15 @@ router.get('/metodos-pago', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
-  try {
-    const venta = await Venta.findById(req.params.id);
-    if (!venta) return res.status(404).json({ error: 'Venta no encontrada' });
-    res.json(venta);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener la venta' });
-  }
-});
+// router.get('/:id', async (req, res) => {
+//   try {
+//     const venta = await Venta.findById(req.params.id);
+//     if (!venta) return res.status(404).json({ error: 'Venta no encontrada' });
+//     res.json(venta);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Error al obtener la venta' });
+//   }
+// });
 
 // POST: Crear nueva venta
 router.post('/', async (req, res) => {
@@ -138,5 +138,27 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+router.get('/resumen-anual', async (req, res) => {
+  try {
+    const resultado = await Venta.aggregate([
+      {
+        $group: {
+          _id: {
+            año: { $year: '$fecha' },
+            mes: { $month: '$fecha' }
+          },
+          total: { $sum: '$total' }
+        }
+      },
+      { $sort: { '_id.año': 1, '_id.mes': 1 } }
+    ]);
+    console.log(resultado);
+
+    res.json(resultado);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al generar resumen anual de ventas' });
+  }
+});
 
 module.exports = router;

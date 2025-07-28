@@ -27,4 +27,17 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params
+  try {
+    const proveedorEliminado = await Proveedor.findByIdAndDelete(id);
+    if (!proveedorEliminado) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+
+  }
+})
 module.exports = router;
